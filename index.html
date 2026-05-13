@@ -368,8 +368,14 @@ input#apiKey::placeholder{color:var(--text3);}
     <h1>Prompt <em>Architect</em></h1>
     <p>A minimalist tool for professional prompt engineering.</p>
   </div>
-
-
+  <!-- API KEY -->
+  <div class="card" id="apiCard">
+    <div class="card-label">🔑 Groq API Key</div>
+    <div class="api-row">
+      <input type="password" id="apiKey" placeholder="gsk_..." autocomplete="off" aria-label="Groq API Key" spellcheck="false"/>
+    </div>
+    <p class="api-hint">Get a free key at <a href="https://console.groq.com" target="_blank" style="color:var(--accent2);">console.groq.com</a> (30 req/min free).</p>
+  </div>
 
   <!-- INPUT -->
   <div class="card">
@@ -475,7 +481,15 @@ input#apiKey::placeholder{color:var(--text3);}
 (function(){
   /* ── Theme ── */
   const themeBtn = document.getElementById('themeBtn');
+  const apiKeyInput = document.getElementById('apiKey');
   const html = document.documentElement;
+
+  // Load API Key
+  apiKeyInput.value = localStorage.getItem('pe_groq_key') || '';
+  apiKeyInput.addEventListener('input', () => {
+    localStorage.setItem('pe_groq_key', apiKeyInput.value.trim());
+  });
+
   let theme = localStorage.getItem('pe_theme') || 'dark';
   apply(theme);
 
@@ -747,15 +761,14 @@ input#apiKey::placeholder{color:var(--text3);}
   }
 
   /* ── generatePrompt() — powered by Groq (free) ── */
-  // 🔑 Paste your free Groq API key here → https://console.groq.com
-  const GROQ_API_KEY = 'YOUR_GROQ_API_KEY_HERE';
-
   window.generatePrompt = async function() {
     const genBtn = document.getElementById('generateBtn');
+    const apiKey = apiKeyInput.value.trim();
     const input  = ta.value.trim();
     document.getElementById('errorBox').style.display = 'none';
 
-    if(!input){ showError('⚠️ Please enter an idea or sentence.'); return; }
+    if(!apiKey){ showError('⚠️ Please enter your Groq API key.'); return; }
+    if(!input){  showError('⚠️ Please enter an idea or sentence.'); return; }
 
     genBtn.classList.add('loading');
     genBtn.disabled = true;
@@ -797,7 +810,7 @@ input#apiKey::placeholder{color:var(--text3);}
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${GROQ_API_KEY}`
+          'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
           model: model,
