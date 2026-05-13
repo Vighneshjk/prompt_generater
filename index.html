@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Prompt Architect - AI Prompt Optimizer</title>
+<meta name="description" content="Transform plain text into optimized AI prompts instantly."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+/* ── CSS Variables ─────────────────────────────── */
+:root {
+  --bg:           #0d0f1a;
+  --surface:      #141726;
+  --surface2:     #1c2035;
+  --border:       #272d4a;
+  --accent:       #7c5cfc;
+  --accent-glow:  rgba(124,92,252,.25);
+  --accent2:      #38bdf8;
+  --text:         #e8eaf6;
+  --text2:        #8b91b8;
+  --text3:        #4a5080;
+  --success:      #4ade80;
+  --pill-bg:      #1c2035;
+  --radius:       16px;
+  --radius-sm:    10px;
+  --shadow:       0 8px 40px rgba(0,0,0,.55);
+  --transition:   .2s cubic-bezier(.4,0,.2,1);
+}
+[data-theme="light"] {
+  --bg:           #f2f4ff;
+  --surface:      #ffffff;
+  --surface2:     #f7f8ff;
+  --border:       #dde0f5;
+  --accent:       #6240f5;
+  --accent-glow:  rgba(98,64,245,.15);
+  --accent2:      #0284c7;
+  --text:         #131628;
+  --text2:        #4a5380;
+  --text3:        #9196b8;
+  --pill-bg:      #eceeff;
+  --shadow:       0 4px 28px rgba(80,60,200,.10);
+}
+
+/* ── Reset ─────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Inter',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  transition:background var(--transition),color var(--transition);
+}
+
+/* ── Header ────────────────────────────────────── */
+header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 36px;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:100;
+  backdrop-filter:blur(16px);
+}
+.logo{display:flex;align-items:center;gap:10px;}
+.logo-icon{
+  width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;box-shadow:0 2px 14px var(--accent-glow);
+}
+.logo-name{font-size:1.15rem;font-weight:700;letter-spacing:-.02em;}
+.logo-name span{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.theme-btn{
+  width:38px;height:38px;border-radius:50%;
+  border:1px solid var(--border);background:var(--surface2);
+  color:var(--text);font-size:17px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background var(--transition),transform var(--transition);
+}
+.theme-btn:hover{background:var(--pill-bg);transform:rotate(22deg);}
+
+/* ── Main ──────────────────────────────────────── */
+main{max-width:760px;margin:0 auto;padding:52px 20px 100px;}
+
+/* ── Hero ──────────────────────────────────────── */
+.hero{text-align:center;margin-bottom:48px;}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 14px;border-radius:100px;
+  border:1px solid var(--border);background:var(--surface);
+  font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:20px;
+}
+.hero h1{
+  font-size:clamp(2rem,5vw,3.1rem);font-weight:700;
+  letter-spacing:-.035em;line-height:1.12;margin-bottom:14px;
+}
+.hero h1 em{
+  font-style:normal;
+  background:linear-gradient(135deg,var(--accent) 20%,var(--accent2) 80%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.hero p{color:var(--text2);font-size:1.05rem;line-height:1.6;max-width:520px;margin:0 auto;}
+
+/* ── Cards ─────────────────────────────────────── */
+.card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:28px;margin-bottom:18px;
+  box-shadow:var(--shadow);
+  transition:border-color var(--transition),box-shadow var(--transition);
+}
+.card:hover{border-color:var(--accent);box-shadow:0 8px 40px var(--accent-glow);}
+.card-label{
+  font-size:.7rem;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--text3);margin-bottom:14px;
+  display:flex;align-items:center;gap:6px;
+}
+
+/* ── Textarea ──────────────────────────────────── */
+.input-wrapper{position:relative;}
+.input-wrapper label{
+  display:block;font-size:.85rem;font-weight:600;
+  color:var(--text2);margin-bottom:10px;
+}
+textarea#userInput{
+  width:100%;min-height:130px;resize:vertical;
+  background:var(--surface2);border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);padding:14px 16px;
+  color:var(--text);font-family:'Inter',sans-serif;font-size:.97rem;
+  line-height:1.65;outline:none;
+  transition:border-color var(--transition),box-shadow var(--transition);
+}
+textarea#userInput:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px var(--accent-glow);
+}
+textarea#userInput::placeholder{color:var(--text3);}
+.char-count{
+  text-align:right;font-size:.72rem;color:var(--text3);
+  margin-top:6px;
+}
+
+/* ── Pill Groups ───────────────────────────────── */
+.options-stack{display:flex;flex-direction:column;gap:22px;}
+.option-row{}
+.option-row > .row-label{
+  font-size:.78rem;font-weight:600;color:var(--text2);
+  margin-bottom:10px;display:flex;align-items:center;gap:6px;
+}
+.pill-group{display:flex;flex-wrap:wrap;gap:8px;}
+.pill{
+  padding:7px 16px;border-radius:100px;
+  border:1.5px solid var(--border);
+  background:var(--pill-bg);color:var(--text2);
+  font-size:.82rem;font-weight:500;
+  cursor:pointer;user-select:none;white-space:nowrap;
+  transition:all var(--transition);
+}
+.pill:hover{border-color:var(--accent);color:var(--text);background:var(--surface2);}
+.pill.active{
+  background:var(--accent);border-color:var(--accent);
+  color:#fff;box-shadow:0 2px 14px var(--accent-glow);
+}
+
+/* ── Divider ───────────────────────────────────── */
+.divider{height:1px;background:var(--border);margin:4px 0;}
+
+/* ── Buttons ───────────────────────────────────── */
+.btn-row{display:flex;gap:12px;margin-top:22px;}
+#generateBtn{
+  flex:1;padding:14px 20px;
+  background:linear-gradient(135deg,var(--accent),#9d7bff);
+  border:none;border-radius:var(--radius-sm);
+  color:#fff;font-size:.97rem;font-weight:600;
+  cursor:pointer;letter-spacing:.01em;
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  box-shadow:0 4px 22px var(--accent-glow);
+  transition:opacity var(--transition),transform var(--transition),box-shadow var(--transition);
+}
+#generateBtn:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 6px 30px rgba(124,92,252,.5);}
+#generateBtn:active{transform:translateY(0);}
+#clearBtn{
+  padding:14px 22px;border-radius:var(--radius-sm);
+  border:1.5px solid var(--border);background:transparent;
+  color:var(--text2);font-size:.97rem;font-weight:500;
+  cursor:pointer;transition:all var(--transition);
+}
+#clearBtn:hover{border-color:var(--text3);color:var(--text);background:var(--surface2);}
+
+/* ── Output ────────────────────────────────────── */
+#outputSection{display:none;margin-top:22px;}
+.output-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.output-label{
+  font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--accent2);display:flex;align-items:center;gap:7px;
+}
+.output-label::before{
+  content:'';display:block;width:7px;height:7px;border-radius:50%;
+  background:var(--accent2);box-shadow:0 0 6px var(--accent2);
+  animation:pulse 1.8s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+#copyBtn{
+  padding:6px 18px;border-radius:100px;
+  border:1.5px solid var(--accent2);background:transparent;
+  color:var(--accent2);font-size:.78rem;font-weight:500;
+  cursor:pointer;transition:all var(--transition);
+}
+#copyBtn:hover{background:var(--accent2);color:#fff;}
+#copyBtn.copied{background:var(--success);border-color:var(--success);color:#fff;}
+#outputText{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:20px;
+  font-family:'JetBrains Mono',monospace;font-size:.87rem;
+  line-height:1.8;color:var(--text);white-space:pre-wrap;word-break:break-word;
+}
+
+/* ── Bouncing Dots Loader ───────────────────────── */
+.dots-loader{display:none;align-items:center;gap:5px;}
+.dots-loader span{
+  width:7px;height:7px;border-radius:50%;background:#fff;
+  animation:bounce .65s ease-in-out infinite;
+}
+.dots-loader span:nth-child(2){animation-delay:.12s;}
+.dots-loader span:nth-child(3){animation-delay:.24s;}
+@keyframes bounce{
+  0%,100%{transform:translateY(0);opacity:.5;}
+  50%{transform:translateY(-6px);opacity:1;}
+}
+#generateBtn.loading .dots-loader{display:flex;}
+#generateBtn.loading .btn-label{display:none;}
+
+/* ── Error ─────────────────────────────────────── */
+.error-box{
+  margin-top:14px;padding:12px 16px;
+  background:rgba(248,113,113,.10);border:1px solid #f87171;
+  border-radius:var(--radius-sm);color:#f87171;font-size:.84rem;
+  display:none;
+}
+
+/* ── History ───────────────────────────────────── */
+#historySection{margin-top:28px;}
+.history-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;
+}
+.history-title{
+  font-size:.7rem;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--text3);
+  display:flex;align-items:center;gap:7px;
+}
+.clear-history{
+  background:none;border:1px solid var(--border);border-radius:100px;
+  color:var(--text3);font-size:.72rem;padding:4px 12px;
+  cursor:pointer;transition:all var(--transition);
+}
+.clear-history:hover{border-color:var(--error);color:var(--error);}
+.history-list{
+  display:flex;flex-direction:column;gap:10px;
+  max-height:520px;overflow-y:auto;
+  scrollbar-width:thin;scrollbar-color:var(--border) transparent;
+}
+.history-list::-webkit-scrollbar{width:4px;}
+.history-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+.history-empty{
+  text-align:center;padding:32px 20px;
+  color:var(--text3);font-size:.88rem;
+  background:var(--surface);border:1px dashed var(--border);
+  border-radius:var(--radius-sm);
+}
+.history-empty span{display:block;font-size:1.6rem;margin-bottom:8px;}
+.history-item{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:14px 16px;
+  position:relative;overflow:hidden;
+  transition:border-color var(--transition),box-shadow var(--transition);
+}
+.history-item::before{
+  content:'';position:absolute;left:0;top:0;width:3px;height:100%;
+  background:linear-gradient(180deg,var(--accent),var(--accent2));
+}
+.history-item:hover{border-color:var(--accent);box-shadow:0 4px 18px var(--accent-glow);}
+.history-badges{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;align-items:center;}
+.history-badge{
+  font-size:.65rem;font-weight:600;padding:2px 8px;
+  border-radius:100px;border:1px solid var(--border);
+  background:var(--surface2);color:var(--text3);
+  text-transform:uppercase;letter-spacing:.05em;
+}
+.history-badge.style-badge{border-color:var(--accent);color:var(--accent);background:rgba(124,92,252,.08);}
+.history-badge.tone-badge{border-color:var(--accent2);color:var(--accent2);background:rgba(56,189,248,.08);}
+.history-time{font-size:.65rem;color:var(--text3);margin-left:auto;}
+.history-input-row{
+  font-size:.78rem;color:var(--text2);margin-bottom:5px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.history-input-row strong{color:var(--text3);font-weight:600;margin-right:4px;font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;}
+.history-prompt-row{
+  font-size:.82rem;color:var(--text);line-height:1.5;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  margin-bottom:10px;
+}
+.history-actions{display:flex;gap:8px;justify-content:flex-end;}
+.hist-btn{
+  padding:5px 14px;border-radius:100px;font-size:.76rem;font-weight:500;
+  cursor:pointer;transition:all var(--transition);border:1.5px solid var(--border);
+  background:transparent;color:var(--text2);
+}
+.hist-btn:hover{border-color:var(--accent);color:var(--accent);}
+.hist-btn.restore:hover{border-color:var(--accent2);color:var(--accent2);}
+.hist-btn.copied-flash{background:var(--success);border-color:var(--success);color:#fff;}
+
+/* ── API Key ───────────────────────────────────── */
+.api-row{display:flex;gap:10px;align-items:center;}
+input#apiKey{
+  flex:1;background:var(--surface2);border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);padding:10px 14px;
+  color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.84rem;
+  outline:none;transition:border-color var(--transition);
+}
+input#apiKey:focus{border-color:var(--accent);}
+input#apiKey::placeholder{color:var(--text3);}
+.api-hint{margin-top:7px;font-size:.72rem;color:var(--text3);}
+
+/* ── Fade animation ────────────────────────────── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+.fade-up{animation:fadeUp .32s ease forwards;}
+
+/* ── Responsive ────────────────────────────────── */
+@media(max-width:580px){
+  header{padding:14px 16px;}
+  main{padding:32px 14px 70px;}
+  .card{padding:18px;}
+  .btn-row{flex-direction:column;}
+  #clearBtn{width:100%;}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">✦</div>
+    <div class="logo-name">Prompt <span>Engineer</span></div>
+  </div>
+  <button class="theme-btn" id="themeBtn" aria-label="Toggle theme">🌙</button>
+</header>
+
+<!-- MAIN -->
+<main>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">✦ AI Prompt Optimizer</div>
+    <h1>Turn Ideas Into<br/><em>Engineered Prompts</em></h1>
+    <p>Type any plain sentence or idea — get a production-ready, optimized AI prompt in seconds.</p>
+  </div>
+
+
+
+  <!-- INPUT -->
+  <div class="card">
+    <div class="input-wrapper">
+      <label for="userInput">Your idea or sentence</label>
+      <textarea id="userInput" placeholder="e.g. summarize a news article for a 10-year-old" aria-label="Your idea or sentence" maxlength="1000"></textarea>
+      <div class="char-count"><span id="charCount">0</span> / 1000</div>
+    </div>
+  </div>
+
+  <!-- OPTIONS -->
+  <div class="card">
+    <div class="card-label">⚙️ Customization</div>
+    <div class="options-stack">
+
+      <div class="option-row">
+        <div class="row-label">Prompt Style</div>
+        <div class="pill-group" id="styleGroup" role="group" aria-label="Prompt style">
+          <div class="pill active" data-group="style" data-value="Detailed" tabindex="0" role="button" aria-pressed="true">Detailed</div>
+          <div class="pill" data-group="style" data-value="Concise" tabindex="0" role="button" aria-pressed="false">Concise</div>
+          <div class="pill" data-group="style" data-value="Chain-of-thought" tabindex="0" role="button" aria-pressed="false">Chain-of-thought</div>
+          <div class="pill" data-group="style" data-value="Few-shot" tabindex="0" role="button" aria-pressed="false">Few-shot</div>
+          <div class="pill" data-group="style" data-value="Role-based" tabindex="0" role="button" aria-pressed="false">Role-based</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="option-row">
+        <div class="row-label">Output Format</div>
+        <div class="pill-group" id="formatGroup" role="group" aria-label="Output format">
+          <div class="pill active" data-group="format" data-value="Plain text" tabindex="0" role="button" aria-pressed="true">Plain text</div>
+          <div class="pill" data-group="format" data-value="Bullet points" tabindex="0" role="button" aria-pressed="false">Bullet points</div>
+          <div class="pill" data-group="format" data-value="JSON" tabindex="0" role="button" aria-pressed="false">JSON</div>
+          <div class="pill" data-group="format" data-value="Markdown" tabindex="0" role="button" aria-pressed="false">Markdown</div>
+          <div class="pill" data-group="format" data-value="Table" tabindex="0" role="button" aria-pressed="false">Table</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="option-row">
+        <div class="row-label">Tone</div>
+        <div class="pill-group" id="toneGroup" role="group" aria-label="Tone">
+          <div class="pill active" data-group="tone" data-value="Neutral" tabindex="0" role="button" aria-pressed="true">Neutral</div>
+          <div class="pill" data-group="tone" data-value="Professional" tabindex="0" role="button" aria-pressed="false">Professional</div>
+          <div class="pill" data-group="tone" data-value="Friendly" tabindex="0" role="button" aria-pressed="false">Friendly</div>
+          <div class="pill" data-group="tone" data-value="Technical" tabindex="0" role="button" aria-pressed="false">Technical</div>
+          <div class="pill" data-group="tone" data-value="Creative" tabindex="0" role="button" aria-pressed="false">Creative</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="btn-row">
+      <button id="generateBtn" onclick="generatePrompt()" aria-label="Generate prompt">
+        <div class="dots-loader"><span></span><span></span><span></span></div>
+        <span class="btn-label">✦ Generate Prompt </span>
+      </button>
+      <button id="clearBtn" aria-label="Clear inputs">Clear</button>
+    </div>
+  </div>
+
+  <div class="error-box" id="errorBox"></div>
+
+  <!-- OUTPUT -->
+  <div class="card fade-up" id="outputSection">
+    <div class="output-header">
+      <div class="output-label">Engineered Prompt</div>
+      <button id="copyBtn" aria-label="Copy prompt">Copy</button>
+    </div>
+    <div id="outputText"></div>
+  </div>
+
+  <!-- HISTORY -->
+  <div id="historySection">
+    <div class="history-header">
+      <div class="history-title">🕘 Prompt History</div>
+      <button class="clear-history" id="clearHistory" aria-label="Clear all history">Clear history</button>
+    </div>
+    <div class="history-list" id="historyList">
+      <div class="history-empty" id="historyEmpty">
+        <span>💬</span>
+        No history yet. Generated prompts will appear here.
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+(function(){
+  /* ── Theme ── */
+  const themeBtn = document.getElementById('themeBtn');
+  const html = document.documentElement;
+  let theme = localStorage.getItem('pe_theme') || 'dark';
+  apply(theme);
+
+  themeBtn.addEventListener('click', () => {
+    theme = theme === 'dark' ? 'light' : 'dark';
+    apply(theme);
+    localStorage.setItem('pe_theme', theme);
+  });
+
+  function apply(t){
+    html.setAttribute('data-theme', t);
+    themeBtn.textContent = t === 'dark' ? '🌙' : '☀️';
+  }
+
+  /* ── Char count ── */
+  const ta = document.getElementById('userInput');
+  const cc = document.getElementById('charCount');
+  ta.addEventListener('input', () => { cc.textContent = ta.value.length; });
+
+  /* ── Pill selection ── */
+  const selections = { style:'Detailed', format:'Plain text', tone:'Neutral' };
+
+  document.querySelectorAll('.pill').forEach(pill => {
+    const activate = () => {
+      const g = pill.dataset.group;
+      document.querySelectorAll(`.pill[data-group="${g}"]`).forEach(p => {
+        p.classList.remove('active');
+        p.setAttribute('aria-pressed','false');
+      });
+      pill.classList.add('active');
+      pill.setAttribute('aria-pressed','true');
+      selections[g] = pill.dataset.value;
+    };
+    pill.addEventListener('click', activate);
+    pill.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); activate(); } });
+  });
+
+  /* ── Clear ── */
+  document.getElementById('clearBtn').addEventListener('click', () => {
+    ta.value = '';
+    cc.textContent = '0';
+    document.getElementById('outputSection').style.display = 'none';
+    document.getElementById('errorBox').style.display = 'none';
+    ta.focus();
+  });
+
+  /* ── History (in-memory array, max 10) ── */
+  let promptHistory = [];
+
+  function saveHistory(item){
+    promptHistory.unshift(item);
+    if(promptHistory.length > 10) promptHistory = promptHistory.slice(0, 10);
+    renderHistory();
+  }
+
+  function trunc(str, n){
+    return str.length > n ? str.slice(0, n).trimEnd() + '…' : str;
+  }
+
+  function renderHistory(){
+    const sec   = document.getElementById('historySection');
+    const list  = document.getElementById('historyList');
+    const empty = document.getElementById('historyEmpty');
+    sec.style.display = 'block'; // always visible (shows empty state)
+
+    if(!promptHistory.length){
+      list.innerHTML = '';
+      list.appendChild(empty);
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+
+    list.innerHTML = promptHistory.map((h, i) => `
+      <div class="history-item">
+        <div class="history-badges">
+          <span class="history-badge style-badge">${esc(h.style)}</span>
+          <span class="history-badge tone-badge">${esc(h.tone)}</span>
+          <span class="history-time">${h.time}</span>
+        </div>
+        <div class="history-input-row">
+          <strong>Input</strong>${esc(trunc(h.input, 60))}
+        </div>
+        <div class="history-prompt-row">${esc(trunc(h.prompt, 120))}</div>
+        <div class="history-actions">
+          <button class="hist-btn restore" data-i="${i}" aria-label="Restore input">&#8617; Restore</button>
+          <button class="hist-btn copy-hist" data-i="${i}" aria-label="Copy prompt">Copy</button>
+        </div>
+      </div>`).join('');
+
+    // Event delegation on the list
+    list.querySelectorAll('.hist-btn.copy-hist').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const h = promptHistory[+btn.dataset.i];
+        navigator.clipboard.writeText(h.prompt).then(() => {
+          btn.textContent = '✓ Copied!';
+          btn.classList.add('copied-flash');
+          setTimeout(() => { btn.textContent='Copy'; btn.classList.remove('copied-flash'); }, 2000);
+        });
+      });
+    });
+
+    list.querySelectorAll('.hist-btn.restore').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const h = promptHistory[+btn.dataset.i];
+        ta.value = h.input;
+        cc.textContent = h.input.length;
+        ta.focus();
+        ta.scrollIntoView({ behavior:'smooth', block:'center' });
+      });
+    });
+  }
+
+  document.getElementById('clearHistory').addEventListener('click', () => {
+    promptHistory = [];
+    renderHistory();
+  });
+
+  renderHistory(); // show empty state on load
+
+  /* ── Output ── */
+  function showOutput(text){
+    const sec = document.getElementById('outputSection');
+    document.getElementById('outputText').textContent = text;
+    sec.style.display = 'block';
+    sec.classList.remove('fade-up');
+    void sec.offsetWidth;
+    sec.classList.add('fade-up');
+    sec.scrollIntoView({ behavior:'smooth', block:'start' });
+  }
+
+  /* ── Copy ── */
+  document.getElementById('copyBtn').addEventListener('click', () => {
+    const text = document.getElementById('outputText').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent='Copy'; btn.classList.remove('copied'); }, 2000);
+    });
+  });
+
+  /* ── Error ── */
+  function showError(msg){
+    const box = document.getElementById('errorBox');
+    box.textContent = msg;
+    box.style.display = 'block';
+    setTimeout(() => box.style.display='none', 6000);
+  }
+
+  /* ── buildSystemPrompt(style, format, tone) ── */
+  function buildSystemPrompt(style, format, tone) {
+
+    // —— STYLE LAYER ——
+    const styleInstructions = {
+      'Detailed':
+        'You are an expert prompt engineer. Craft a DETAILED, structured AI prompt that includes:\n' +
+        '  1. Role definition — who the AI should act as.\n' +
+        '  2. Context — relevant background the AI needs.\n' +
+        '  3. Core task — the specific action to perform.\n' +
+        '  4. Constraints — what to avoid or limit.\n' +
+        '  5. Output format instructions — exactly how to structure the response.\n' +
+        'Use clear numbered sections or labels for each part.',
+
+      'Concise':
+        'You are an expert prompt engineer. Write a CONCISE prompt: a single, tight paragraph of 2–4 sentences. ' +
+        'Include only the essential task, any critical constraint, and the expected output. No fluff, no padding, no bullet points.',
+
+      'Chain-of-thought':
+        'You are an expert prompt engineer. Write a prompt that instructs the AI to reason step by step before answering. ' +
+        'Include an explicit instruction such as "Think step by step" or "Reason through this carefully before giving your final answer." ' +
+        'Structure the prompt so the AI shows its reasoning process, then delivers the conclusion.',
+
+      'Few-shot':
+        'You are an expert prompt engineer. Write a prompt that contains exactly 2 input→output example pairs ' +
+        'to demonstrate the expected pattern, followed by the real task. ' +
+        'Format examples as:\nExample 1:\nInput: ...\nOutput: ...\n\nExample 2:\nInput: ...\nOutput: ...\n\nNow:\nInput: [user task]\nOutput:',
+
+      'Role-based':
+        'You are an expert prompt engineer. Write a prompt that opens with "You are a [specific expert role]..." ' +
+        'Choose the most relevant expert role for the task (e.g. data scientist, UX designer, legal analyst). ' +
+        'The role assignment must directly shape the expertise and perspective the AI brings to the response.',
+    };
+
+    // —— FORMAT LAYER ——
+    const formatInstructions = {
+      'Plain text':    '',  // no extra instruction
+      'Bullet points': '\n\nThe prompt must explicitly instruct the AI to respond using bullet points (each point starting with • or -).',
+      'JSON':
+        '\n\nThe prompt must explicitly instruct the AI to respond in valid JSON only. ' +
+        'Define the expected fields clearly within the prompt (e.g. { "summary": "", "keyPoints": [], "recommendation": "" }). ' +
+        'No prose outside the JSON block.',
+      'Markdown':
+        '\n\nThe prompt must instruct the AI to format the response in Markdown: ' +
+        'use ## headings, **bold** for key terms, and ``` code blocks``` where relevant.',
+      'Table':
+        '\n\nThe prompt must instruct the AI to present its response as a structured Markdown table ' +
+        'with clear column headers appropriate to the content.',
+    };
+
+    // —— TONE LAYER ——
+    const toneInstructions = {
+      'Neutral':      '',  // default, no extra tuning
+      'Professional': '\n\nWrite the engineered prompt using formal, precise language. Avoid contractions and casual phrasing.',
+      'Friendly':     '\n\nWrite the engineered prompt in a warm, approachable tone. Use conversational language and encouraging phrasing.',
+      'Technical':    '\n\nWrite the engineered prompt with technical precision. Use domain-specific terminology, be explicit about parameters, and assume an expert audience.',
+      'Creative':     '\n\nWrite the engineered prompt with imaginative, expressive language. Encourage the AI to think laterally and explore unexpected angles.',
+    };
+
+    // —— COMPOSE FINAL SYSTEM PROMPT ——
+    const base    = styleInstructions[style]  || styleInstructions['Detailed'];
+    const fmtNote = formatInstructions[format] ?? '';
+    const toneNote= toneInstructions[tone]    ?? '';
+
+    return (
+      base + fmtNote + toneNote +
+      '\n\nCRITICAL: Return ONLY the final engineered prompt text. ' +
+      'Do not include any explanation, preamble, label, or commentary. ' +
+      'The output must be ready to paste directly into an AI system.'
+    );
+  }
+
+  /* ── generatePrompt() — powered by Groq (free) ── */
+  // 🔑 Paste your free Groq API key here → https://console.groq.com
+  const GROQ_API_KEY = 'YOUR_GROQ_API_KEY_HERE';
+
+  window.generatePrompt = async function() {
+    const genBtn = document.getElementById('generateBtn');
+    const input  = ta.value.trim();
+    document.getElementById('errorBox').style.display = 'none';
+
+    if(!input){ showError('⚠️ Please enter an idea or sentence.'); return; }
+
+    genBtn.classList.add('loading');
+    genBtn.disabled = true;
+
+    // Build system + user messages using adaptive buildSystemPrompt()
+    const systemMsg = buildSystemPrompt(selections.style, selections.format, selections.tone);
+
+    const userMsg =
+      `Plain text input:\n"${input}"\n\n` +
+      `Convert this into an optimized AI prompt following all instructions above.`;
+
+    try {
+      // Groq — OpenAI-compatible endpoint, free tier
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${GROQ_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: 'llama-3.3-70b-versatile',   // best free model on Groq
+          max_tokens: 1000,
+          temperature: 0.7,
+          messages: [
+            { role: 'system', content: systemMsg },
+            { role: 'user',   content: userMsg   }
+          ]
+        })
+      });
+
+      if(!res.ok){
+        let errMsg = `Groq API error ${res.status}`;
+        try {
+          const errData = await res.json();
+          if(errData.error?.message) errMsg = errData.error.message;
+        } catch(_){}
+        throw new Error(errMsg);
+      }
+
+      const data   = await res.json();
+      const result = data.choices?.[0]?.message?.content?.trim();
+      if(!result) throw new Error('Received an empty response. Please try again.');
+
+      showOutput(result);
+      saveHistory({
+        prompt: result,
+        input,
+        style:  selections.style,
+        format: selections.format,
+        tone:   selections.tone,
+        time:   new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })
+      });
+
+    } catch(e){
+      showError('⚠️ ' + e.message);
+    } finally {
+      genBtn.classList.remove('loading');
+      genBtn.disabled = false;
+    }
+  };
+
+  function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+})();
+</script>
+</body>
+</html>
